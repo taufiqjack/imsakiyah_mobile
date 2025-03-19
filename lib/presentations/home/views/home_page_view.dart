@@ -21,271 +21,296 @@ class HomePageView extends StatefulWidget {
       backgroundColor: white,
       appBar: AppBar(
         title: CommonText(
-          text: 'CahyonozDev',
+          text: 'Jadwal Imsakiyah',
           color: darkgrey,
         ),
         centerTitle: true,
         elevation: 0,
         backgroundColor: white,
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            const CommonText(
-              text: 'Jadwal Imsakiyah',
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
+      body: Stack(
+        children: [
+          Align(
+            alignment: Alignment.bottomRight,
+            child: CommonText(
+              text: 'Cahyonoz Dev',
               color: black,
             ),
-            BlocBuilder<RegionCubit, RegionState>(
-              builder: (context, state) {
-                return state.when(
-                    initial: () => SkeletonAnimation(
-                            child: Container(
-                          height: 40,
-                          decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: greyTwo),
-                        )),
-                    error: (message) => CommonTextField(
-                          readOnly: true,
-                          fillColor: blackTwo,
-                          suffixIcon: const Icon(
-                            Icons.keyboard_arrow_down,
-                            size: 16.0,
-                          ),
-                          filled: true,
-                          hintText: message,
-                          textInputType: TextInputType.text,
-                        ),
-                    success: (region) => region?.data == null
-                        ? const SizedBox()
-                        : CommonDropDown(
-                            dropDownColor: white,
-                            hintText: 'Pilih Provinci',
-                            validatorText: 'provinsi can\t be empty!',
-                            value: controller.reg.value,
-                            items: region?.data?.map((e) {
-                              return DropdownMenuItem(
-                                  value: e,
-                                  child: CommonText(
-                                    text: e,
-                                    color: greyLight,
-                                  ));
-                            }).toList(),
-                            onChange: (value) {
-                              controller.reg.value = value;
-                              controller.city.value == null;
-                              context.read<CitizenCubit>().getCity(
-                                  AddKabupaten(provinsi: controller.reg.value),
-                                  context);
-                            }).topPadded(5));
-              },
-            ).bottomPadded12(),
-            BlocBuilder<CitizenCubit, CitizenState>(
-              builder: (context, state) {
-                return state.when(
-                  initial: () => const CommonTextField(
-                    hintText: 'Pilih Provinsi terlebih dahulu',
-                    textInputType: TextInputType.text,
-                    readOnly: true,
-                    fillColor: greyTwo,
-                    filled: true,
-                  ),
-                  error: (message) => CommonTextField(
-                    readOnly: true,
-                    fillColor: blackTwo,
-                    suffixIcon: const Icon(
-                      Icons.keyboard_arrow_down,
-                      size: 16.0,
-                    ),
-                    filled: true,
-                    hintText: message,
-                    textInputType: TextInputType.text,
-                  ),
-                  success: (city) => Column(
-                    children: [
-                      ValueListenableBuilder(
-                        valueListenable: controller.city,
-                        builder: (context, value, child) => CommonDropDown(
-                            dropDownColor: white,
-                            hintText: 'Pilih Kabupaten',
-                            validatorText: 'provinsi can\t be empty!',
-                            value: value == null ? value : null,
-                            items: city?.data?.map((e) {
-                              return DropdownMenuItem(
-                                  value: e,
-                                  child: CommonText(
-                                    text: e,
-                                    color: greyLight,
-                                  ));
-                            }).toList(),
-                            onChange: (value) {
-                              controller.city.value = value;
-                              if (value != null) {
-                                context.read<ImsakiyahCubit>().getImsakiyah(
-                                    AddImsakiyah(
-                                        provinsi: controller.reg.value,
-                                        kabkota: controller.city.value),
-                                    context);
-                              }
-                            }).topPadded(5).bottomPadded8(),
+          ).paddedLTRB(bottom: 10, right: 10),
+          SingleChildScrollView(
+            child: Column(
+              children: [
+                const CommonText(
+                  text: '',
+                  fontSize: 16,
+                  fontWeight: FontWeight.w700,
+                  color: black,
+                ),
+                BlocBuilder<RegionCubit, RegionState>(
+                  builder: (context, state) {
+                    return state.when(
+                        initial: () => SkeletonAnimation(
+                                child: Container(
+                              height: 40,
+                              decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: greyTwo),
+                            )),
+                        error: (message) => CommonTextField(
+                              readOnly: true,
+                              fillColor: blackTwo,
+                              suffixIcon: const Icon(
+                                Icons.keyboard_arrow_down,
+                                size: 16.0,
+                              ),
+                              filled: true,
+                              hintText: message,
+                              textInputType: TextInputType.text,
+                            ),
+                        success: (region) => region?.data == null
+                            ? const SizedBox()
+                            : CommonDropDown(
+                                dropDownColor: white,
+                                hintText: 'Pilih Provinci',
+                                validatorText: 'provinsi can\t be empty!',
+                                value: controller.reg.value,
+                                items: region?.data?.map((e) {
+                                  return DropdownMenuItem(
+                                      value: e,
+                                      child: CommonText(
+                                        text: e,
+                                        color: greyLight,
+                                      ));
+                                }).toList(),
+                                onChange: (value) {
+                                  controller.reg.value = value;
+                                  controller.city.value == null;
+                                  context.read<CitizenCubit>().getCity(
+                                      AddKabupaten(
+                                          provinsi: controller.reg.value),
+                                      context);
+                                }).topPadded(5));
+                  },
+                ).bottomPadded12(),
+                BlocBuilder<CitizenCubit, CitizenState>(
+                  builder: (context, state) {
+                    return state.when(
+                      initial: () => const CommonTextField(
+                        hintText: 'Pilih Provinsi terlebih dahulu',
+                        textInputType: TextInputType.text,
+                        readOnly: true,
+                        fillColor: greyTwo,
+                        filled: true,
                       ),
-                      ValueListenableBuilder(
-                          valueListenable: controller.city,
-                          builder: (context, value, child) => value == null
-                              ? const SizedBox()
-                              : BlocBuilder<ImsakiyahCubit, ImsakiyahState>(
-                                  builder: (context, state) {
-                                  return state.when(
-                                    initial: () => SkeletonAnimation(
-                                        child: Container(
-                                      height: 40,
-                                      decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(5),
-                                          color: greyTwo),
-                                    )),
-                                    error: (message) => Center(
-                                      child: CommonText(text: message),
-                                    ),
-                                    success: (imsakiyah) => ListView.builder(
-                                      shrinkWrap: true,
-                                      itemCount: imsakiyah?.data?.length,
-                                      itemBuilder: (context, index) {
-                                        final imsakiya =
-                                            imsakiyah?.data?[index];
-                                        return Column(
-                                          children: [
-                                            CommonText(
-                                              text:
-                                                  '${imsakiya?.kabkota} | ${imsakiya?.masehi} M /${imsakiya?.hijriah} H',
-                                              color: black,
-                                            ).bottomPadded12(),
-                                            const Row(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment
-                                                      .spaceBetween,
+                      error: (message) => CommonTextField(
+                        readOnly: true,
+                        fillColor: blackTwo,
+                        suffixIcon: const Icon(
+                          Icons.keyboard_arrow_down,
+                          size: 16.0,
+                        ),
+                        filled: true,
+                        hintText: message,
+                        textInputType: TextInputType.text,
+                      ),
+                      success: (city) => Column(
+                        children: [
+                          ValueListenableBuilder(
+                            valueListenable: controller.city,
+                            builder: (context, value, child) => CommonDropDown(
+                                dropDownColor: white,
+                                hintText: 'Pilih Kabupaten',
+                                validatorText: 'provinsi can\t be empty!',
+                                value: value == null ? value : null,
+                                items: city?.data?.map((e) {
+                                  return DropdownMenuItem(
+                                      value: e,
+                                      child: CommonText(
+                                        text: e,
+                                        color: greyLight,
+                                      ));
+                                }).toList(),
+                                onChange: (value) {
+                                  controller.city.value = value;
+                                  if (value != null) {
+                                    context.read<ImsakiyahCubit>().getImsakiyah(
+                                        AddImsakiyah(
+                                            provinsi: controller.reg.value,
+                                            kabkota: controller.city.value),
+                                        context);
+                                  }
+                                }).topPadded(5).bottomPadded8(),
+                          ),
+                          ValueListenableBuilder(
+                              valueListenable: controller.city,
+                              builder: (context, value, child) => value == null
+                                  ? const SizedBox()
+                                  : BlocBuilder<ImsakiyahCubit, ImsakiyahState>(
+                                      builder: (context, state) {
+                                      return state.when(
+                                        initial: () => SkeletonAnimation(
+                                            child: Container(
+                                          height: 40,
+                                          decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(5),
+                                              color: greyTwo),
+                                        )),
+                                        error: (message) => Center(
+                                          child: CommonText(text: message),
+                                        ),
+                                        success: (imsakiyah) =>
+                                            ListView.builder(
+                                          shrinkWrap: true,
+                                          itemCount: imsakiyah?.data?.length,
+                                          itemBuilder: (context, index) {
+                                            final imsakiya =
+                                                imsakiyah?.data?[index];
+                                            return Column(
                                               children: [
                                                 CommonText(
-                                                  text: 'Tanggal',
-                                                  fontSize: 12,
-                                                  textAlign: TextAlign.start,
+                                                  text:
+                                                      '${imsakiya?.kabkota} | ${imsakiya?.masehi} M /${imsakiya?.hijriah} H',
                                                   color: black,
-                                                ),
-                                                CommonText(
-                                                  text: 'Imsak',
-                                                  fontSize: 12,
-                                                  textAlign: TextAlign.center,
-                                                  color: black,
-                                                ),
-                                                CommonText(
-                                                  text: 'Shubuh',
-                                                  fontSize: 12,
-                                                  textAlign: TextAlign.center,
-                                                  color: black,
-                                                ),
-                                                CommonText(
-                                                  text: 'Dhuha',
-                                                  fontSize: 12,
-                                                  textAlign: TextAlign.center,
-                                                  color: black,
-                                                ),
-                                                CommonText(
-                                                  text: 'Dzuhur',
-                                                  fontSize: 12,
-                                                  textAlign: TextAlign.center,
-                                                  color: black,
-                                                ),
-                                                CommonText(
-                                                  text: '\'Asar',
-                                                  fontSize: 12,
-                                                  textAlign: TextAlign.center,
-                                                  color: black,
-                                                ),
-                                                CommonText(
-                                                  text: 'Magrib',
-                                                  fontSize: 12,
-                                                  textAlign: TextAlign.center,
-                                                  color: black,
-                                                ),
-                                                CommonText(
-                                                  text: '\'Isya',
-                                                  fontSize: 12,
-                                                  textAlign: TextAlign.center,
-                                                  color: black,
-                                                ),
-                                              ],
-                                            ).rightPadded20().bottomPadded6(),
-                                            ListView.builder(
-                                              shrinkWrap: true,
-                                              itemCount:
-                                                  imsakiya?.imsakiyah?.length,
-                                              itemBuilder: (context, index) {
-                                                final prayer =
-                                                    imsakiya?.imsakiyah?[index];
-                                                return Table(
-                                                  textDirection:
-                                                      TextDirection.ltr,
+                                                ).bottomPadded12(),
+                                                const Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
                                                   children: [
-                                                    TableRow(children: [
-                                                      CommonText(
-                                                        text:
-                                                            '${prayer?.tanggal}',
-                                                        color: black,
-                                                      ),
-                                                      CommonText(
-                                                        text:
-                                                            '${prayer?.imsak}',
-                                                        color: black,
-                                                      ),
-                                                      CommonText(
-                                                        text:
-                                                            '${prayer?.subuh}',
-                                                        color: black,
-                                                      ),
-                                                      CommonText(
-                                                        text:
-                                                            '${prayer?.dhuha}',
-                                                        color: black,
-                                                      ),
-                                                      CommonText(
-                                                        text:
-                                                            '${prayer?.dzuhur}',
-                                                        color: black,
-                                                      ),
-                                                      CommonText(
-                                                        text:
-                                                            '${prayer?.ashar}',
-                                                        color: black,
-                                                      ),
-                                                      CommonText(
-                                                        text:
-                                                            '${prayer?.maghrib}',
-                                                        color: black,
-                                                      ),
-                                                      CommonText(
-                                                        text: '${prayer?.isya}',
-                                                        color: black,
-                                                      ),
-                                                    ])
+                                                    CommonText(
+                                                      text: 'Tanggal',
+                                                      fontSize: 12,
+                                                      textAlign:
+                                                          TextAlign.start,
+                                                      color: black,
+                                                    ),
+                                                    CommonText(
+                                                      text: 'Imsak',
+                                                      fontSize: 12,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      color: black,
+                                                    ),
+                                                    CommonText(
+                                                      text: 'Shubuh',
+                                                      fontSize: 12,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      color: black,
+                                                    ),
+                                                    CommonText(
+                                                      text: 'Dhuha',
+                                                      fontSize: 12,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      color: black,
+                                                    ),
+                                                    CommonText(
+                                                      text: 'Dzuhur',
+                                                      fontSize: 12,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      color: black,
+                                                    ),
+                                                    CommonText(
+                                                      text: '\'Asar',
+                                                      fontSize: 12,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      color: black,
+                                                    ),
+                                                    CommonText(
+                                                      text: 'Magrib',
+                                                      fontSize: 12,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      color: black,
+                                                    ),
+                                                    CommonText(
+                                                      text: '\'Isya',
+                                                      fontSize: 12,
+                                                      textAlign:
+                                                          TextAlign.center,
+                                                      color: black,
+                                                    ),
                                                   ],
-                                                );
-                                              },
-                                            )
-                                          ],
-                                        );
-                                      },
-                                    ),
-                                  );
-                                })),
-                    ],
-                  ),
-                );
-              },
-            ),
-          ],
-        ).paddedLTRB(left: 15, right: 15, top: 10),
+                                                )
+                                                    .rightPadded20()
+                                                    .bottomPadded6(),
+                                                ListView.builder(
+                                                  shrinkWrap: true,
+                                                  itemCount: imsakiya
+                                                      ?.imsakiyah?.length,
+                                                  itemBuilder:
+                                                      (context, index) {
+                                                    final prayer = imsakiya
+                                                        ?.imsakiyah?[index];
+                                                    return Table(
+                                                      textDirection:
+                                                          TextDirection.ltr,
+                                                      children: [
+                                                        TableRow(children: [
+                                                          CommonText(
+                                                            text:
+                                                                '${prayer?.tanggal}',
+                                                            color: black,
+                                                          ),
+                                                          CommonText(
+                                                            text:
+                                                                '${prayer?.imsak}',
+                                                            color: black,
+                                                          ),
+                                                          CommonText(
+                                                            text:
+                                                                '${prayer?.subuh}',
+                                                            color: black,
+                                                          ),
+                                                          CommonText(
+                                                            text:
+                                                                '${prayer?.dhuha}',
+                                                            color: black,
+                                                          ),
+                                                          CommonText(
+                                                            text:
+                                                                '${prayer?.dzuhur}',
+                                                            color: black,
+                                                          ),
+                                                          CommonText(
+                                                            text:
+                                                                '${prayer?.ashar}',
+                                                            color: black,
+                                                          ),
+                                                          CommonText(
+                                                            text:
+                                                                '${prayer?.maghrib}',
+                                                            color: black,
+                                                          ),
+                                                          CommonText(
+                                                            text:
+                                                                '${prayer?.isya}',
+                                                            color: black,
+                                                          ),
+                                                        ])
+                                                      ],
+                                                    );
+                                                  },
+                                                )
+                                              ],
+                                            );
+                                          },
+                                        ),
+                                      );
+                                    })),
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ],
+            ).paddedLTRB(left: 15, right: 15, top: 10),
+          ),
+        ],
       ),
     );
   }
