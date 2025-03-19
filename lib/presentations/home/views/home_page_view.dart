@@ -20,6 +20,11 @@ class HomePageView extends StatefulWidget {
     return Scaffold(
       backgroundColor: white,
       appBar: AppBar(
+        title: CommonText(
+          text: 'CahyonozDev',
+          color: darkgrey,
+        ),
+        centerTitle: true,
         elevation: 0,
         backgroundColor: white,
       ),
@@ -28,6 +33,8 @@ class HomePageView extends StatefulWidget {
           children: [
             const CommonText(
               text: 'Jadwal Imsakiyah',
+              fontSize: 16,
+              fontWeight: FontWeight.w700,
               color: black,
             ),
             BlocBuilder<RegionCubit, RegionState>(
