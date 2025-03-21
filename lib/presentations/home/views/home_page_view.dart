@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:imsakiyah_mobile/cores/bloc/cubit/citizen_cubit/citizen_cubit.dart';
@@ -18,15 +20,13 @@ class HomePageView extends StatefulWidget {
 
   Widget build(BuildContext context, HomePageController controller) {
     return Scaffold(
-      backgroundColor: white,
       appBar: AppBar(
         title: CommonText(
           text: 'Jadwal Imsakiyah',
-          color: darkgrey,
+          color: white,
         ),
         centerTitle: true,
         elevation: 0,
-        backgroundColor: white,
       ),
       body: Stack(
         children: [
@@ -34,7 +34,7 @@ class HomePageView extends StatefulWidget {
             alignment: Alignment.bottomRight,
             child: CommonText(
               text: 'Cahyonoz Dev',
-              color: black,
+              color: white,
             ),
           ).paddedLTRB(bottom: 10, right: 10),
           SingleChildScrollView(
@@ -84,11 +84,7 @@ class HomePageView extends StatefulWidget {
                                 }).toList(),
                                 onChange: (value) {
                                   controller.reg.value = value;
-                                  controller.city.value == null;
-                                  context.read<CitizenCubit>().getCity(
-                                      AddKabupaten(
-                                          provinsi: controller.reg.value),
-                                      context);
+                                  controller.getCity();
                                 }).topPadded(5));
                   },
                 ).bottomPadded12(),
@@ -133,175 +129,208 @@ class HomePageView extends StatefulWidget {
                                 onChange: (value) {
                                   controller.city.value = value;
                                   if (value != null) {
-                                    context.read<ImsakiyahCubit>().getImsakiyah(
-                                        AddImsakiyah(
-                                            provinsi: controller.reg.value,
-                                            kabkota: controller.city.value),
-                                        context);
+                                    controller.getImsakiyah();
                                   }
                                 }).topPadded(5).bottomPadded8(),
                           ),
-                          ValueListenableBuilder(
-                              valueListenable: controller.city,
-                              builder: (context, value, child) => value == null
-                                  ? const SizedBox()
-                                  : BlocBuilder<ImsakiyahCubit, ImsakiyahState>(
-                                      builder: (context, state) {
-                                      return state.when(
-                                        initial: () => SkeletonAnimation(
-                                            child: Container(
-                                          height: 40,
-                                          decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(5),
-                                              color: greyTwo),
-                                        )),
-                                        error: (message) => Center(
-                                          child: CommonText(text: message),
-                                        ),
-                                        success: (imsakiyah) =>
-                                            ListView.builder(
-                                          shrinkWrap: true,
-                                          itemCount: imsakiyah?.data?.length,
-                                          itemBuilder: (context, index) {
-                                            final imsakiya =
-                                                imsakiyah?.data?[index];
-                                            return Column(
-                                              children: [
-                                                CommonText(
-                                                  text:
-                                                      '${imsakiya?.kabkota} | ${imsakiya?.masehi} M /${imsakiya?.hijriah} H',
-                                                  color: black,
-                                                ).bottomPadded12(),
-                                                const Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .spaceBetween,
+                          SizedBox(
+                            height: MediaQuery.sizeOf(context).height / 1.5,
+                            child: SingleChildScrollView(
+                              child: ValueListenableBuilder(
+                                  valueListenable: controller.city,
+                                  builder: (context, value, child) => controller
+                                              .isLoading ==
+                                          false
+                                      ? const SizedBox()
+                                      : BlocBuilder<ImsakiyahCubit,
+                                              ImsakiyahState>(
+                                          builder: (context, state) {
+                                          return state.when(
+                                            initial: () => SkeletonAnimation(
+                                                child: Container(
+                                              height: 40,
+                                              decoration: BoxDecoration(
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                  color: greyTwo),
+                                            )),
+                                            error: (message) => Center(
+                                              child: CommonText(text: message),
+                                            ),
+                                            success: (imsakiyah) =>
+                                                ListView.builder(
+                                              physics:
+                                                  NeverScrollableScrollPhysics(),
+                                              shrinkWrap: true,
+                                              itemCount:
+                                                  imsakiyah?.data?.length,
+                                              itemBuilder: (context, index) {
+                                                final imsakiya =
+                                                    imsakiyah?.data?[index];
+                                                return Column(
                                                   children: [
                                                     CommonText(
-                                                      text: 'Tanggal',
-                                                      fontSize: 12,
-                                                      textAlign:
-                                                          TextAlign.start,
-                                                      color: black,
-                                                    ),
-                                                    CommonText(
-                                                      text: 'Imsak',
-                                                      fontSize: 12,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      color: black,
-                                                    ),
-                                                    CommonText(
-                                                      text: 'Shubuh',
-                                                      fontSize: 12,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      color: black,
-                                                    ),
-                                                    CommonText(
-                                                      text: 'Dhuha',
-                                                      fontSize: 12,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      color: black,
-                                                    ),
-                                                    CommonText(
-                                                      text: 'Dzuhur',
-                                                      fontSize: 12,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      color: black,
-                                                    ),
-                                                    CommonText(
-                                                      text: '\'Asar',
-                                                      fontSize: 12,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      color: black,
-                                                    ),
-                                                    CommonText(
-                                                      text: 'Magrib',
-                                                      fontSize: 12,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      color: black,
-                                                    ),
-                                                    CommonText(
-                                                      text: '\'Isya',
-                                                      fontSize: 12,
-                                                      textAlign:
-                                                          TextAlign.center,
-                                                      color: black,
-                                                    ),
-                                                  ],
-                                                )
-                                                    .rightPadded20()
-                                                    .bottomPadded6(),
-                                                ListView.builder(
-                                                  shrinkWrap: true,
-                                                  itemCount: imsakiya
-                                                      ?.imsakiyah?.length,
-                                                  itemBuilder:
-                                                      (context, index) {
-                                                    final prayer = imsakiya
-                                                        ?.imsakiyah?[index];
-                                                    return Table(
-                                                      textDirection:
-                                                          TextDirection.ltr,
+                                                      text:
+                                                          '${imsakiya?.kabkota} | ${imsakiya?.masehi} M /${imsakiya?.hijriah} H',
+                                                    ).bottomPadded12(),
+                                                    Table(
+                                                      border: TableBorder.all(
+                                                          color: white),
                                                       children: [
-                                                        TableRow(children: [
-                                                          CommonText(
-                                                            text:
-                                                                '${prayer?.tanggal}',
-                                                            color: black,
-                                                          ),
-                                                          CommonText(
-                                                            text:
-                                                                '${prayer?.imsak}',
-                                                            color: black,
-                                                          ),
-                                                          CommonText(
-                                                            text:
-                                                                '${prayer?.subuh}',
-                                                            color: black,
-                                                          ),
-                                                          CommonText(
-                                                            text:
-                                                                '${prayer?.dhuha}',
-                                                            color: black,
-                                                          ),
-                                                          CommonText(
-                                                            text:
-                                                                '${prayer?.dzuhur}',
-                                                            color: black,
-                                                          ),
-                                                          CommonText(
-                                                            text:
-                                                                '${prayer?.ashar}',
-                                                            color: black,
-                                                          ),
-                                                          CommonText(
-                                                            text:
-                                                                '${prayer?.maghrib}',
-                                                            color: black,
-                                                          ),
-                                                          CommonText(
-                                                            text:
-                                                                '${prayer?.isya}',
-                                                            color: black,
-                                                          ),
-                                                        ])
+                                                        TableRow(
+                                                          children: [
+                                                            CommonText(
+                                                              text: 'Tanggal',
+                                                              fontSize: 12,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ).topPadded4(),
+                                                            CommonText(
+                                                              text: 'Imsak',
+                                                              fontSize: 12,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ).topPadded4(),
+                                                            CommonText(
+                                                              text: 'Shubuh',
+                                                              fontSize: 12,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ).topPadded4(),
+                                                            CommonText(
+                                                              text: 'Dhuha',
+                                                              fontSize: 12,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ).topPadded4(),
+                                                            CommonText(
+                                                              text: 'Dzuhur',
+                                                              fontSize: 12,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ).topPadded4(),
+                                                            CommonText(
+                                                              text: '\'Asar',
+                                                              fontSize: 12,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ).topPadded4(),
+                                                            CommonText(
+                                                              text: 'Magrib',
+                                                              fontSize: 12,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            ).topPadded4(),
+                                                            CommonText(
+                                                              text: '\'Isya',
+                                                              fontSize: 12,
+                                                              textAlign:
+                                                                  TextAlign
+                                                                      .center,
+                                                            )
+                                                                .bottomPadded6()
+                                                                .topPadded4(),
+                                                          ],
+                                                        ),
                                                       ],
-                                                    );
-                                                  },
-                                                )
-                                              ],
-                                            );
-                                          },
-                                        ),
-                                      );
-                                    })),
+                                                    ),
+                                                    ListView.builder(
+                                                      physics:
+                                                          NeverScrollableScrollPhysics(),
+                                                      shrinkWrap: true,
+                                                      padding: EdgeInsets.zero,
+                                                      itemCount: imsakiya
+                                                          ?.imsakiyah?.length,
+                                                      itemBuilder:
+                                                          (context, index) {
+                                                        final prayer = imsakiya
+                                                            ?.imsakiyah?[index];
+                                                        return Table(
+                                                          border:
+                                                              TableBorder.all(
+                                                                  color: white),
+                                                          textDirection:
+                                                              TextDirection.ltr,
+                                                          children: [
+                                                            TableRow(children: [
+                                                              CommonText(
+                                                                text:
+                                                                    '${prayer?.tanggal}',
+                                                                textAlign:
+                                                                    TextAlign
+                                                                        .center,
+                                                              )
+                                                                  .topPadded4()
+                                                                  .bottomPadded4(),
+                                                              CommonText(
+                                                                text:
+                                                                    '${prayer?.imsak}',
+                                                              )
+                                                                  .topPadded4()
+                                                                  .bottomPadded4()
+                                                                  .leftPadded4(),
+                                                              CommonText(
+                                                                text:
+                                                                    '${prayer?.subuh}',
+                                                              )
+                                                                  .topPadded4()
+                                                                  .bottomPadded4()
+                                                                  .leftPadded4(),
+                                                              CommonText(
+                                                                text:
+                                                                    '${prayer?.dhuha}',
+                                                              )
+                                                                  .topPadded4()
+                                                                  .bottomPadded4()
+                                                                  .leftPadded4(),
+                                                              CommonText(
+                                                                text:
+                                                                    '${prayer?.dzuhur}',
+                                                              )
+                                                                  .topPadded4()
+                                                                  .bottomPadded4()
+                                                                  .leftPadded4(),
+                                                              CommonText(
+                                                                text:
+                                                                    '${prayer?.ashar}',
+                                                              )
+                                                                  .topPadded4()
+                                                                  .bottomPadded4()
+                                                                  .leftPadded4(),
+                                                              CommonText(
+                                                                text:
+                                                                    '${prayer?.maghrib}',
+                                                              )
+                                                                  .topPadded4()
+                                                                  .bottomPadded4()
+                                                                  .leftPadded4(),
+                                                              CommonText(
+                                                                text:
+                                                                    '${prayer?.isya}',
+                                                              )
+                                                                  .topPadded4()
+                                                                  .bottomPadded4()
+                                                                  .leftPadded4(),
+                                                            ])
+                                                          ],
+                                                        );
+                                                      },
+                                                    )
+                                                  ],
+                                                );
+                                              },
+                                            ),
+                                          );
+                                        })),
+                            ),
+                          ),
                         ],
                       ),
                     );

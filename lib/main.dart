@@ -58,6 +58,8 @@ class MyApp extends StatelessWidget {
           useMaterial3: false,
         ),
         home: const HomePageView(),
+        darkTheme: ThemeData.dark(),
+        themeMode: ThemeMode.dark,
         navigatorKey: alice.getNavigatorKey(),
       ),
     );
